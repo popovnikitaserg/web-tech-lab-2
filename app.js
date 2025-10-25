@@ -1,3 +1,14 @@
+const STORAGE_KEY = 'todo_tasks'
+
+function saveTasks() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
+function loadTasks() {
+  const data = localStorage.getItem(STORAGE_KEY);
+  if (data) tasks = JSON.parse(data);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const app = document.createElement('main');
   app.className = 'container';
@@ -33,6 +44,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.body.append(app);
   let tasks = [];
+
+  function saveTasks() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  }
+
+  function loadTasks() {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) tasks = JSON.parse(data);
+  }
 
   const render = () => {
     list.innerHTML = '';
@@ -71,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
       li.append(checkbox, span, btn);
       list.append(li);
     });
+    saveTasks();
   };
 
   form.addEventListener('submit', (e) => {
@@ -83,5 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  loadTasks();
   render();
 });
