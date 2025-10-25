@@ -38,23 +38,46 @@ document.addEventListener('DOMContentLoaded', () => {
     list.innerHTML = '';
     tasks.forEach((task, i) => {
       const li = document.createElement('li');
-      li.textContent = task;
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.done;
+      checkbox.addEventListener('change', () => {
+        task.done = checkbox.checked;
+        render();
+      })
+
+      const span = document.createElement('span');
+      span.textContent = task.text;
+      span.contentEditable = true;
+      span.addEventListener('blur', () => {
+        task.text = span.textContent.trim() || 'Пустое название';
+        render();
+      })
+
+      
       const btn = document.createElement('button');
       btn.textContent = '🗑️';
       btn.addEventListener('click', () => {
         tasks.splice(i, 1);
         render();
       });
-      li.append(btn);
+
+      if (task.done) {
+        span.style.textDecoration = 'line-through';
+        span.style.opacity = '0.6';
+      }
+
+      li.append(checkbox, span, btn);
       list.append(li);
     });
   };
 
-  document.querySelector('form').addEventListener('submit', (e) => {
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     if (input.value.trim()) {
-      tasks.push(input.value.trim());
+      tasks.push({ text: input.value.trim(), done: false});
       input.value = '';
       render();
     }
