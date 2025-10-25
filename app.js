@@ -56,7 +56,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const render = () => {
     list.innerHTML = '';
-    tasks.forEach((task, i) => {
+
+    const visibleTasks = tasks.filter(task => {
+      const matchesSearch = task.text.toLowerCase().includes(searchQuery);
+      const matchesFilter =
+        filterStatus === 'all' ||
+        (filterStatus === 'done' && task.done) ||
+        (filterStatus === 'not_done' && !task.done);
+      return matchesSearch && matchesFilter;
+    });
+
+    visibleTasks.forEach((task, i) => {
       const li = document.createElement('li');
 
       const checkbox = document.createElement('input');
@@ -79,8 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const btn = document.createElement('button');
       btn.textContent = '🗑️';
       btn.addEventListener('click', () => {
-        tasks.splice(i, 1);
-        render();
+        const index = tasks.indexOf(task);
+        if (index > -1) {
+          tasks.splice(index, 1);
+          render();
+        }
       });
 
       if (task.done) {
@@ -102,6 +115,34 @@ document.addEventListener('DOMContentLoaded', () => {
       input.value = '';
       render();
     }
+  });
+
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.placeholder = 'Поиск задачи...';
+  searchInput.style.marginRight = '8px';
+
+  const filterSelect = document.createElement('select');
+  ['all', 'done', 'not_done'].forEach(val => {
+    const option = document.createElement('option');
+    option.value = val;
+    option.textContent = val === 'all' ? 'Все' : val === 'done' ? 'Выполненные' : 'Невыполненные';
+    filterSelect.append(option);
+  });
+
+  app.insertBefore(searchInput, form);
+  app.insertBefore(filterSelect, form);
+
+  let searchQuery = '';
+  let filterStatus = 'all';
+  searchInput.addEventListener('input', (e) => {
+    searchQuery = e.target.value.toLowerCase();
+    render();
+  });
+
+  filterSelect.addEventListener('change', (e) => {
+    filterStatus = e.target.value;
+    render();
   });
 
   loadTasks();
