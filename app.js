@@ -21,3 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.body.append(app);
 });
+
+const style = document.createElement('style');
+style.textContent = `
+body { font-family: sans-serif; background: #0f1620; color: #e6eef6; margin: 0; padding: 20px; }
+.container { max-width: 600px; margin: auto; background: #1e293b; border-radius: 8px; padding: 20px; }
+form { display: flex; gap: 8px; margin-bottom: 16px; }
+input, button { padding: 8px; border-radius: 6px; border: none; }
+button { background: #6EE7B7; color: #0f1620; cursor: pointer; }
+ul { list-style: none; padding: 0; }
+li { background: #334155; margin-bottom: 8px; padding: 8px; border-radius: 6px; }
+`;
+document.head.append(style);
