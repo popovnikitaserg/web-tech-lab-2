@@ -30,6 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
   list.id = 'task-list';
   app.append(list);
 
+  const dateInput = document.createElement('input');
+  dateInput.type = 'date';
+  dateInput.style.marginLeft = '8px';
+  form.insertBefore(dateInput, button);
+
   const style = document.createElement('style');
   style.textContent = `
   body { font-family: sans-serif; background: #0f1620; color: #e6eef6; margin: 0; padding: 20px; }
@@ -101,7 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
         span.style.opacity = '0.6';
       }
 
-      li.append(checkbox, span, btn);
+      const dateSpan = document.createElement('span');
+      dateSpan.textContent = ` (${new Date(task.date).toLocaleDateString('en-GB')})`;
+      dateSpan.style.marginLeft = '8px';
+      li.append(checkbox, span, dateSpan, btn);
       list.append(li);
     });
     saveTasks();
@@ -111,8 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
 
     if (input.value.trim()) {
-      tasks.push({ text: input.value.trim(), done: false});
+      const date = dateInput.value ? new Date(dateInput.value) : new Date();
+      tasks.push({ 
+        text: input.value.trim(), 
+        done: false,
+        date: date.toISOString()});
       input.value = '';
+      dateInput.value = '';
       render();
     }
   });
