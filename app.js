@@ -120,6 +120,10 @@ document.addEventListener('DOMContentLoaded', () => {
   app.append(list);
 
   let draggedLi = null;
+
+  let touchDragging = false;
+  let touchStartY = 0;
+  let currentLi = null;
   const placeholder = document.createElement('li');
   placeholder.className = 'placeholder';
   placeholder.style.height = '6px';
@@ -288,6 +292,55 @@ document.addEventListener('DOMContentLoaded', () => {
           if (draggedLi) draggedLi.style.display = 'flex';
           placeholder.remove();
           draggedLi = null;
+        });
+
+        li.addEventListener('touchstart', (e) => {
+          touchDragging = true;
+          currentLi = li;
+          draggedIndex = Number(li.dataset.index);
+          touchStartY = e.touches[0].clientY;
+
+          li.after(placeholder);
+          li.style.opacity = "0.3";
+        });
+
+        li.addEventListener('touchmove', (e) => {
+          if (!touchDragging) return;
+          e.preventDefault();
+
+          const touchY = e.touches[0].clientY;
+          const listItems = [...list.querySelectorAll('li:not(.placeholder)')];
+
+          for (const item of listItems) {
+            const rect = item.getBoundingClientRect();
+            if (touchY > rect.top && touchY < rect.bottom) {
+              if (touchY > rect.top + rect.height / 2) {
+                item.after(placeholder);
+              } else {
+                item.before(placeholder);
+              }
+              break;
+            }
+          }
+        });
+
+        li.addEventListener('touchend', () => {
+          if (!touchDragging) return;
+
+          const oldIndex = draggedIndex;
+          const newIndex = Array.from(list.children).indexOf(placeholder);
+
+          if (newIndex !== oldIndex && newIndex !== oldIndex + 1) {
+            const [moved] = tasks.splice(oldIndex, 1);
+            tasks.splice(newIndex > oldIndex ? newIndex - 1 : newIndex, 0, moved);
+            saveTasks();
+          }
+
+          placeholder.remove();
+          currentLi.style.opacity = "1";
+          touchDragging = false;
+          currentLi = null;
+          render();
         });
       } else {
         li.draggable = false;
