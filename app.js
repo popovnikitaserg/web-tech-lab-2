@@ -255,6 +255,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let displayedTasks = [...tasks];
 
+    let longPressTimeout = null;
+    let isLongPressActive = false;
+
+
     if (sortSelect.value === 'date_asc') {
       displayedTasks.sort((a,b) => new Date(a.date) - new Date(b.date));
     } else if (sortSelect.value === 'date_desc') {
@@ -295,18 +299,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         li.addEventListener('touchstart', (e) => {
-          touchDragging = true;
-          currentLi = li;
-          draggedIndex = Number(li.dataset.index);
-          touchStartY = e.touches[0].clientY;
+          isLongPressActive = false;
 
-          li.after(placeholder);
-          li.style.opacity = "0.3";
+          longPressTimeout = setTimeout(() => {
+            isLongPressActive = true;
+
+            touchDragging = true;
+            currentLi = li;
+            draggedIndex = Number(li.dataset.index);
+            touchStartY = e.touches[0].clientY;
+
+            li.after(placeholder);
+            li.style.opacity = "0.3";
+          }, 350);
         });
 
         li.addEventListener('touchmove', (e) => {
-          if (!touchDragging) return;
+          if (!isLongPressActive) {
+            // пользователь пытается скроллить — не блокируем
+            return;
+          }
+
           e.preventDefault();
+          if (!touchDragging) return;
 
           const touchY = e.touches[0].clientY;
           const listItems = [...list.querySelectorAll('li:not(.placeholder)')];
@@ -325,7 +340,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         li.addEventListener('touchend', () => {
-          if (!touchDragging) return;
+          clearTimeout(longPressTimeout);
+
+          if (!isLongPressActive) return;
 
           const oldIndex = draggedIndex;
           const newIndex = Array.from(list.children).indexOf(placeholder);
