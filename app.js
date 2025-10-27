@@ -49,6 +49,18 @@ document.addEventListener('DOMContentLoaded', () => {
   settingsModal.style.color = '#e6eef6';
   app.append(settingsModal);
 
+  settingsModal.className = 'settings-modal';
+
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.placeholder = 'Поиск...';
+  searchInput.style.marginLeft = '8px';
+  searchInput.style.flexGrow = '1';
+  searchInput.style.padding = '8px';
+  settingsBtn.after(searchInput);
+
+  searchInput.addEventListener('input', render);
+
   const sortSelect = document.createElement('select');
   ['manual','date_asc','date_desc'].forEach(val => {
     const option = document.createElement('option');
@@ -57,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
                          val === 'date_asc' ? 'По дате ↑' : 'По дате ↓';
     sortSelect.append(option);
   });
-  settingsModal.append(document.createTextNode('Сортировка: '), sortSelect, document.createElement('br'));
 
   const filterPriority = document.createElement('select');
   ['all','1','2','3'].forEach(p => {
@@ -66,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
     option.textContent = p === 'all' ? 'Все приоритеты' : `Приоритет ${p}`;
     filterPriority.append(option);
   });
-  settingsModal.append(document.createTextNode('Фильтр по приоритету: '), filterPriority, document.createElement('br'));
 
   const filterStatus = document.createElement('select');
   ['all','done','not_done'].forEach(val => {
@@ -75,12 +85,24 @@ document.addEventListener('DOMContentLoaded', () => {
     option.textContent = val === 'all' ? 'Все' : val === 'done' ? 'Выполненные' : 'Невыполненные';
     filterStatus.append(option);
   });
-  settingsModal.append(document.createTextNode('Фильтр по статусу: '), filterStatus, document.createElement('br'));
 
   const closeSettings = document.createElement('button');
   closeSettings.textContent = 'Закрыть';
   closeSettings.style.marginTop = '8px';
-  settingsModal.append(closeSettings);
+
+  const sortLabel = document.createElement('label');
+  sortLabel.textContent = 'Сортировка';
+  sortLabel.append(sortSelect);
+
+  const filterPriorityLabel = document.createElement('label');
+  filterPriorityLabel.textContent = 'Фильтр по приоритету';
+  filterPriorityLabel.append(filterPriority);
+
+  const filterStatusLabel = document.createElement('label');
+  filterStatusLabel.textContent = 'Фильтр по статусу';
+  filterStatusLabel.append(filterStatus);
+
+  settingsModal.append(sortLabel, filterPriorityLabel, filterStatusLabel, closeSettings);
 
   settingsBtn.addEventListener('click', e => {
     e.preventDefault();
@@ -108,16 +130,109 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const style = document.createElement('style');
   style.textContent = `
-    body { font-family: sans-serif; background: #0f1620; color: #e6eef6; margin: 0; padding: 20px; }
-    .container { max-width: 600px; margin: auto; background: #1e293b; border-radius: 8px; padding: 20px; }
-    form { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-    input, select, button { padding: 8px; border-radius: 6px; border: none; }
-    button { background: #6EE7B7; color: #0f1620; cursor: pointer; }
-    ul { list-style: none; padding: 0; }
-    li { background: #334155; margin-bottom: 8px; padding: 8px; border-radius: 6px; display: flex; align-items: center; gap: 8px; }
-    li span { flex-grow: 1; }
-    div#task-list li.drag-over { border: 2px dashed #6EE7B7; }
-  `;
+  body { 
+    font-family: sans-serif; 
+    background: #0f1620; 
+    color: #e6eef6; 
+    margin: 0; 
+    padding: 20px; 
+  }
+
+  .container { 
+    max-width: 600px; 
+    margin: auto; 
+    background: #1e293b; 
+    border-radius: 8px; 
+    padding: 20px; 
+    box-shadow: 0 0 25px rgba(0,0,0,.4);
+  }
+
+  form { 
+    display: flex; 
+    gap: 8px; 
+    margin-bottom: 16px; 
+    flex-wrap: wrap; 
+  }
+
+  input, select, button { 
+    padding: 8px; 
+    border-radius: 6px; 
+    border: none; 
+    font-size: 14px;
+  }
+
+  button { 
+    background: #6EE7B7; 
+    color: #0f1620; 
+    cursor: pointer; 
+    transition: 0.15s;
+  }
+  button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0,0,0,.3);
+  }
+
+  /* --- SETTINGS MODAL --- */
+  .settings-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    transform: translate(-50%, -50%);
+    background: #162032;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 100;
+    box-shadow: 0 0 30px rgba(0,0,0,.5);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .settings-modal label {
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* --- LIST STYLE --- */
+  ul { 
+    list-style: none; 
+    padding: 0; 
+  }
+
+  li { 
+    background: #26364a; 
+    margin-bottom: 10px; 
+    padding: 12px; 
+    border-radius: 6px; 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    justify-content: space-between;
+  }
+
+  .task-main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 4px;
+  }
+
+  .task-meta {
+    font-size: 12px;
+    opacity: 0.7;
+  }
+
+  .placeholder {
+    height: 6px !important;
+    background: #6EE7B7 !important;
+    border-radius: 3px;
+    margin: 6px 0;
+  }
+`;
   document.head.append(style);
   document.body.append(app);
   let tasks = [];
@@ -143,11 +258,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     displayedTasks = displayedTasks.filter(task => {
+      const matchesText = task.text.toLowerCase().includes(searchInput.value.toLowerCase());
       const matchesPriority = filterPriority.value === 'all' || task.priority == filterPriority.value;
       const matchesStatus = filterStatus.value === 'all' ||
                             (filterStatus.value === 'done' && task.done) ||
                             (filterStatus.value === 'not_done' && !task.done);
-      return matchesPriority && matchesStatus;
+      return matchesText && matchesPriority && matchesStatus;
     });
 
     displayedTasks.forEach((task, i) => {
@@ -216,7 +332,17 @@ document.addEventListener('DOMContentLoaded', () => {
         span.style.opacity = '0.6';
       }
 
-      li.append(checkbox, span, prioritySpan, dateSpan, deleteBtn);
+      const textBlock = document.createElement('div');
+      textBlock.className = 'task-main';
+      textBlock.append(span);
+
+      const meta = document.createElement('div');
+      meta.className = 'task-meta';
+      meta.textContent = `Приоритет ${task.priority} • ${dateSpan.textContent}`;
+
+      textBlock.append(meta);
+
+      li.append(checkbox, textBlock, deleteBtn);
       list.append(li);
     });
 
