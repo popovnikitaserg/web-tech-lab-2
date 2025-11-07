@@ -44,15 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const settingsModal = document.createElement('div');
   settingsModal.style.display = 'none';
-  settingsModal.style.position = 'fixed';
-  settingsModal.style.top = '50%';
-  settingsModal.style.left = '50%';
-  settingsModal.style.transform = 'translate(-50%, -50%)';
-  settingsModal.style.background = '#1e293b';
-  settingsModal.style.padding = '20px';
-  settingsModal.style.borderRadius = '8px';
-  settingsModal.style.zIndex = '100';
-  settingsModal.style.color = '#e6eef6';
   app.append(settingsModal);
 
   settingsModal.className = 'settings-modal';
@@ -60,9 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.createElement('input');
   searchInput.type = 'text';
   searchInput.placeholder = 'Поиск...';
-  searchInput.style.marginLeft = '8px';
-  searchInput.style.flexGrow = '1';
-  searchInput.style.padding = '8px';
+  searchInput.classList.add('searchinput')
   settingsBtn.after(searchInput);
 
   searchInput.addEventListener('input', render);
@@ -131,119 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let touchStartY = 0;
   let currentLi = null;
   const placeholder = document.createElement('li');
-  placeholder.className = 'placeholder';
-  placeholder.style.height = '6px';
-  placeholder.style.background = '#6EE7B7';
-  placeholder.style.margin = '4px 0';
-  placeholder.style.borderRadius = '3px';
-  placeholder.style.opacity = '0.8';
+  placeholder.classList.add('placeholder');
+  placeholder.classList.add('active')
 
-  const style = document.createElement('style');
-  style.textContent = `
-  body { 
-    font-family: sans-serif; 
-    background: #0f1620; 
-    color: #e6eef6; 
-    margin: 0; 
-    padding: 20px; 
-  }
-
-  .container { 
-    max-width: 600px; 
-    margin: auto; 
-    background: #1e293b; 
-    border-radius: 8px; 
-    padding: 20px; 
-    box-shadow: 0 0 25px rgba(0,0,0,.4);
-  }
-
-  form { 
-    display: flex; 
-    gap: 8px; 
-    margin-bottom: 16px; 
-    flex-wrap: wrap; 
-  }
-
-  input, select, button { 
-    padding: 8px; 
-    border-radius: 6px; 
-    border: none; 
-    font-size: 14px;
-  }
-
-  button { 
-    background: #6EE7B7; 
-    color: #0f1620; 
-    cursor: pointer; 
-    transition: 0.15s;
-  }
-  button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(0,0,0,.3);
-  }
-
-  /* --- SETTINGS MODAL --- */
-  .settings-modal {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 300px;
-    transform: translate(-50%, -50%);
-    background: #162032;
-    padding: 20px;
-    border-radius: 10px;
-    z-index: 100;
-    box-shadow: 0 0 30px rgba(0,0,0,.5);
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .settings-modal label {
-    font-size: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  /* --- LIST STYLE --- */
-  ul { 
-    list-style: none; 
-    padding: 0; 
-  }
-
-  li { 
-    background: #26364a; 
-    margin-bottom: 10px; 
-    padding: 12px; 
-    border-radius: 6px; 
-    display: flex; 
-    align-items: center; 
-    gap: 10px; 
-    justify-content: space-between;
-  }
-
-  .task-main {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    gap: 4px;
-  }
-
-  .task-meta {
-    font-size: 12px;
-    opacity: 0.7;
-  }
-
-  .placeholder {
-    height: 6px !important;
-    background: #6EE7B7 !important;
-    border-radius: 3px;
-    margin: 6px 0;
-  }
-`;
-  document.head.append(style);
   document.body.append(app);
   let tasks = [];
 
