@@ -1,6 +1,12 @@
 const STORAGE_KEY = 'todo_tasks';
 
 document.addEventListener('DOMContentLoaded', () => {
+  const favicon = document.createElement('link');
+  favicon.rel = 'icon';
+  favicon.type = 'image/png';
+  favicon.href = 'image/android-chrome-192x192.png';
+  document.head.append(favicon);
+  
   const app = document.createElement('main');
   app.className = 'container';
 
@@ -409,6 +415,34 @@ document.addEventListener('DOMContentLoaded', () => {
       const meta = document.createElement('div');
       meta.className = 'task-meta';
       meta.textContent = `Приоритет ${task.priority} • ${dateSpan.textContent}`;
+
+      meta.addEventListener('dblclick', e => {
+        const inputDate = document.createElement('input');
+        inputDate.type = 'date';
+        inputDate.className = 'edit-date-input';
+        inputDate.value = task.date.split('T')[0];
+
+        meta.textContent = '';
+        meta.append(inputDate);
+        inputDate.focus();
+
+        const saveChange = () => {
+          if (inputDate.value) {
+            task.date = new Date(inputDate.value).toISOString();
+            saveTasks();
+            render();
+          } else {
+            render();
+          }
+        };
+
+        inputDate.addEventListener('blur', saveChange);
+        inputDate.addEventListener('keydown', ev => {
+          if (ev.key === 'Enter') {
+            saveChange();
+          }
+        });
+      });
 
       textBlock.append(meta);
 
